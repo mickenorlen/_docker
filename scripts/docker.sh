@@ -142,3 +142,12 @@ function bash() { # Enter container with bash, $arg1 = env
 	fi
 }
 
+function rootbash() { # Enter container as root with bash, $arg1 = env
+	env=$(getEnv $1)
+	if isRunning $env; then
+		sudo docker exec --user 0 -it "${APP_NAME}_${env}_web" /bin/bash
+	else
+		echo "Not running"
+	fi
+}
+

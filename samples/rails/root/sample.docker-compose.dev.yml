@@ -7,4 +7,9 @@ services:
   web:
     container_name: ${APP_NAME}_dev_web
     ports:
-      - "3000:3000"
+      - 3000:3000
+
+  adminer:
+    container_name: ${APP_NAME}_dev_adminer
+    ports:
+      - 8080:8080

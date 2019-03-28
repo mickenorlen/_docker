@@ -4,16 +4,22 @@ services:
   db:
     image: postgres
     volumes:
-      - ./_docker/db_data:/var/lib/postgresql/data
+      - ./_docker/data/db:/var/lib/postgresql/data
 
   web:
+    user: ${CURRENT_UID}
     working_dir: /app
-    command: "bash -c '/app/_docker-resources/scripts/wait-for-it.sh db:5432 -s -- sh /app/_docker-resources/scripts/run.sh'"
+    command: "bash -c '/app/_docker-resources/scripts/wait-for-it.sh db:5432 -s -- sh /app/_docker/startup.sh'"
     image: $BUILD_IMAGE
     volumes:
       - .:/app
-      - ./_docker/gem_data:/gems
+      - ./_docker/data/home:/home/docker
+      - /etc/passwd:/etc/passwd
     depends_on:
       - db
     environment:
-      - BUNDLE_PATH=/gems
+      - HOME=/home/docker
+      - BUNDLE_PATH=/app/_docker/data/bundle
+
+  adminer:
+    image: adminer
