@@ -1,0 +1,19 @@
+version: "3.5"
+
+services:
+  db:
+    image: postgres
+    volumes:
+      - ./_docker/db_data:/var/lib/postgresql/data
+
+  web:
+    working_dir: /app
+    command: "bash -c '/app/_docker-resources/scripts/wait-for-it.sh db:5432 -s -- sh /app/_docker-resources/scripts/run.sh'"
+    image: $BUILD_IMAGE
+    volumes:
+      - .:/app
+      - ./_docker/gem_data:/gems
+    depends_on:
+      - db
+    environment:
+      - BUNDLE_PATH=/gems

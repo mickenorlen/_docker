@@ -1,0 +1,47 @@
+version: "3.5"
+
+networks:
+  net:
+    name: ${NETWORK_NAME}_prod
+services:
+  db:
+    container_name: "${APP_NAME}_prod_db"
+    restart: always
+
+  web:
+    container_name: ${APP_NAME}_prod_web
+    ports:
+      - "8080:80"
+    volumes:
+      - "./_docker-resources/vhosts_prod.conf:/etc/apache2/sites-enabled/000-default.conf"
+      - "./dbox/Dropbox/import_export:/var/www/html/web/fileadmin/user_upload/_temp_/import_export"
+    restart: always
+
+  dropbox:
+    container_name: ${APP_NAME}_prod_dropbox
+    image: janeczku/dropbox
+  # default dir: /dbox/Dropbox
+    volumes:
+      - "./dbox/.dropbox:/dbox/.dropbox"
+      - "./dbox/Dropbox:/dbox/Dropbox"
+    restart: always
+
+  mysqlbackup:
+    container_name: ${APP_NAME}_prod_mysqlbackup
+    image: sharetransition/alpine3.6-cron-automysqlbackup3-gmail
+  # default dir: /backup
+    volumes:
+      - "./dbox/Dropbox/mysqlbackup:/backup"
+      - "./_docker-resources/automysqlbackup.conf:/etc/automysqlbackup/automysqlbackup.conf"
+    environment:
+      - MYSQL_HOST=db
+      - MYSQL_DATABASE=$MYSQL_DATABASE
+      - MYSQL_USER=$MYSQL_USER
+      - MYSQL_PASSWORD=$MYSQL_PASSWORD
+      - TIMEZONE=$TIMEZONE
+      - GMAIL_ACCOUNT=$GMAIL_ACCOUNT
+      - GMAIL_PASSWORD=$GMAIL_PASSWORD
+      - RECIPIENT_EMAIL=$RECIPIENT_EMAIL
+    depends_on:
+      - db
+    restart: always
