@@ -85,8 +85,8 @@ function rmall() { # Rm: containers, images, deps, $arg1 = env
 	# yarn clean TODO
 }
 
-function rebuild() { # Rebuild image $BUILD_IMAGE from $DOCKER_PATH (.env)
-	sudo -E docker build --build-arg PARENT_IMAGE=$PARENT_IMAGE $DOCKER_PATH -t $BUILD_IMAGE
+function rebuild() { # Rebuild image $BUILD_IMAGE from _docker (.env)
+	sudo -E docker build --build-arg PARENT_IMAGE=$PARENT_IMAGE _docker -t $BUILD_IMAGE
 }
 
 function push() { # Push rebuilt image $BUILD_IMAGE to docker hub

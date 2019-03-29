@@ -1,6 +1,7 @@
 #!/bin/bash
-root='../..'
-sampleDir='../samples'
+root="$(pwd)/../.."
+sampleDir="$(pwd)/../samples"
+scripts="$(pwd)"
 
 case "$1" in
  rails) samples="$sampleDir/rails" ;;
@@ -11,7 +12,7 @@ esac
 
 $(./utils.sh getEnv "$samples/root/.sample.env")
 
-mkdir -p $root/$DOCKER_PATH
+mkdir -p $root/_docker
 
 source $samples/install.sh
 install;
