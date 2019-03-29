@@ -18,7 +18,7 @@ install() {
 	$($scripts/utils.sh getEnv "$root/.env")
 	# Install rails
 	export CURRENT_UID=$(id -u):$(id -g);
-	echo "Getting $BUILD_IMAGE locally, pulling from hub or falling back to _docker/Dockerfile..."
+	echo -e "\nGetting $BUILD_IMAGE locally, pulling from hub or falling back to _docker/Dockerfile...\n"
 	yarn d hasImages 2>/dev/null || sudo -E docker-compose pull web || yarn d rebuild
 	sudo -E docker-compose run --no-deps --rm --user 0 web bash -c "chown $CURRENT_UID /home/docker"
 	sudo -E docker-compose run --no-deps --rm web bash -c "bundle install && bundle exec rails new . --force -B --database=postgresql && bundle update"

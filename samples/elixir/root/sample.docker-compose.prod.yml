@@ -9,7 +9,7 @@ services:
     container_name: ${APP_NAME}_prod_web
     restart: always
     ports:
-      - 3000:3000
+      - 4000:4000
 
   adminer:
     container_name: ${APP_NAME}_prod_adminer

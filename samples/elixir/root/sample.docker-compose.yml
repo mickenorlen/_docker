@@ -19,7 +19,8 @@ services:
       - db
     environment:
       - HOME=/home/docker
-      - BUNDLE_PATH=/app/_docker/data/bundle
+      - MIX_HOME=/app/_docker/data/mix
+      - HEX_HOME=/app/_docker/data/hex
 
   adminer:
     image: adminer

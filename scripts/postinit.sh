@@ -5,7 +5,7 @@ scripts="$(pwd)"
 
 case "$1" in
  rails) samples="$sampleDir/rails" ;;
- typo3) samples="$sampleDir/typo3" ;;
+ elixir) samples="$sampleDir/elixir" ;;
  *) echo "No samples for $1"; exit 1 ;;
 esac
 
