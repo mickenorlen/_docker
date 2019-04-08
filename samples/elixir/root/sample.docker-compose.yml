@@ -18,7 +18,7 @@ services:
     depends_on:
       - db
     environment:
-      - HOME=/home/docker
+      - HOME=/app/_docker/data/home
       - MIX_HOME=/app/_docker/data/mix
       - HEX_HOME=/app/_docker/data/hex
 

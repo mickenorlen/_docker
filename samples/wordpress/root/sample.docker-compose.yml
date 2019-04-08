@@ -1,0 +1,32 @@
+version: "3.5"
+
+services:
+  db:
+    image: mysql:5.7
+    environment:
+      MYSQL_DATABASE: $WORDPRESS_DB_NAME
+      MYSQL_USER: $WORDPRESS_DB_USER
+      MYSQL_PASSWORD: $WORDPRESS_DB_PASSWORD
+      MYSQL_ROOT_PASSWORD: $WORDPRESS_DB_ROOT_PASSWORD
+
+    volumes:
+      - ./_docker/data/db:/var/lib/mysql
+
+  web:
+    user: ${CURRENT_UID}
+    working_dir: /app
+    command: "bash -c '/app/_docker-resources/scripts/wait-for-it.sh db:3306 -s -- sh /app/_docker/startup.sh'"
+    image: $BUILD_IMAGE
+    volumes:
+      - .:/app
+      - /etc/passwd:/etc/passwd
+    depends_on:
+      - db
+    environment:
+      HOME: /_docker/data/home
+      WORDPRESS_DB_USER: $WORDPRESS_DB_USER
+      WORDPRESS_DB_PASSWORD: $WORDPRESS_DB_PASSWORD
+      WORDPRESS_DB_NAME: $WORDPRESS_DB_NAME
+
+  adminer:
+    image: adminer

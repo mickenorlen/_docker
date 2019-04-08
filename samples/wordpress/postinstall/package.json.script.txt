@@ -1,0 +1,4 @@
+	"scripts": {
+	  "//": "Run scripts functions with: yarn script functionName - yarn config set script-shell bash",
+		"d": ". ./_docker-resources/scripts/docker.sh && "
+	},

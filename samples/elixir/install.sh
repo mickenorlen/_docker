@@ -13,7 +13,7 @@ install() {
 	cd $root
 
 	# Update .env
-	echo -n "Edit .env: APP_NAME/BUILD_IMAGE [enter]"
+	echo -n "Edit .env [enter]"
 	read waiting
 	$($scripts/utils.sh getEnv "$root/.env")
 
@@ -21,7 +21,6 @@ install() {
 	export CURRENT_UID=$(id -u):$(id -g);
 	echo -e "\nGetting $BUILD_IMAGE locally, trying pull from docker hub or falling back to _docker/Dockerfile...\n"
 	yarn d hasImages 2>/dev/null || sudo -E docker-compose pull web || yarn d rebuild
-	sudo -E docker-compose run --no-deps --rm --user 0 web bash -c "chown $CURRENT_UID /home/docker"
 	sudo -E docker-compose run --no-deps --rm web bash -c "mix local.hex --force && \
     mix local.rebar --force && \
     mix archive.install hex phx_new $PHOENIX_VERSION --force && \

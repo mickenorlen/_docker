@@ -11,5 +11,5 @@ RUN apk add --update \
   && rm -rf /var/cache/apk/*
 
 # Fix paths
-RUN mkdir /app /home/docker
+RUN mkdir /app
 

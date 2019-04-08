@@ -18,7 +18,7 @@ RUN apk add --update \
 # https://github.com/gliderlabs/docker-alpine/issues/53#issuecomment-179486583
 RUN bundle config build.nokogiri --use-system-libraries
 
-RUN mkdir /app /home/docker
+RUN mkdir /app
 
 
 # If using much larger non-alpine parent
