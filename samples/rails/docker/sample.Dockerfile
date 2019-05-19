@@ -9,6 +9,7 @@ RUN apk add --update \
 	tzdata \
   postgresql-dev \
 	nodejs \
+	yarn \
 	postgresql-client \
 	bash \
 	vim \

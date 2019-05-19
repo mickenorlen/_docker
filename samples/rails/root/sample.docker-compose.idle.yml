@@ -1,0 +1,5 @@
+version: "3.5"
+
+services:
+  web:
+    command: "bash -c '/app/_docker-resources/scripts/wait-for-it.sh db:5432 -s -- tail -f /dev/null'"

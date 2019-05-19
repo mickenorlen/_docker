@@ -15,7 +15,7 @@ function help() { # Show list of functions
 
 # Internal functions not listed in help as not prefixed by function
 getEnv() {
-	if [[ $1 == 'prod' ]]; then echo 'prod'; else echo 'dev'; fi
+	if [[ $1 == 'prod' ]]; then echo 'prod'; elif [[ $1 == 'idle' ]]; then echo 'idle'; else echo 'dev'; fi
 }
 
 # Functions not listed in help as not prefixed by function
@@ -102,6 +102,8 @@ function start() { # Start/restart container, $arg1 = env
 	stop $env;
 	if [[ $env == 'prod' ]]; then
 		sudo -E docker-compose -f docker-compose.yml -f docker-compose.prod.yml up -d;
+	elif [[ $env == 'idle' ]]; then
+		sudo -E docker-compose -f docker-compose.yml -f docker-compose.dev.yml -f docker-compose.idle.yml up -d;
 	else
 		sudo -E docker-compose -f docker-compose.yml -f docker-compose.dev.yml up -d;
 	fi
