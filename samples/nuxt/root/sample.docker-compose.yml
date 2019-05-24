@@ -1,0 +1,27 @@
+version: "3.5"
+
+services:
+  # db:
+  #   image: postgres:11-alpine
+  #   volumes:
+  #     - ./_docker/data/db:/var/lib/postgresql/data
+
+  web:
+    user: ${CURRENT_UID}
+    working_dir: /app
+    command: sh /app/_docker/startup.sh
+    #command: "bash -c '/app/_docker-resources/scripts/wait-for-it.sh db:5432 -s -- sh /app/_docker/startup.sh'"
+    image: $BUILD_IMAGE
+    volumes:
+      - .:/app
+      - ./_docker/data/home:/home/docker
+      - /etc/passwd:/etc/passwd
+    # depends_on:
+    #   - db
+    environment:
+      - HOME=/app/_docker/data/home
+      - NUXT_HOST=0.0.0.0
+      - NUXT_PORT=3000
+
+  # adminer:
+  #   image: adminer
