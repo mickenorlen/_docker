@@ -36,7 +36,10 @@ FROM $PARENT_IMAGE
 
 
 
-RUN apk add --update \
+RUN apk add --no-cache --update \
+	python \
+	make \
+	g++ \
 	yarn \
 	bash \
 	vim \
