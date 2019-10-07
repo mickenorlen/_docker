@@ -10,6 +10,10 @@
 
 <body>
 
+	<h1>
+		Hej!
+	</h1>
+
 	<?php wp_footer(); ?>
 </body>
 </html>

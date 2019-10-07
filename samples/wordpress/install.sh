@@ -24,7 +24,9 @@ install() {
 
 	# Add to gitignore
 	echo "# Docker
-_docker/data" >> $root/.gitignore
+_docker/data
+_wordpress
+node_modules" >> $root/.gitignore
 
 	cp -r $samples/webpack $root/_webpack
 	cp -r $samples/theme $root/theme

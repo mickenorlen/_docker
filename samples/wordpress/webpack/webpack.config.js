@@ -104,7 +104,9 @@ module.exports = {
     ]
   },
   plugins: [
-    !DEV && new CleanWebpackPlugin(['build']),
+    !DEV && new CleanWebpackPlugin(['_build'], {
+      root: process.cwd() + '/theme'
+    }),
     new MiniCssExtractPlugin({
       filename: DEV ? 'bundle.css' : 'bundle.[hash:8].css'
     }),
