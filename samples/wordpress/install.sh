@@ -26,7 +26,8 @@ install() {
 	echo "# Docker
 _docker/data
 _wordpress
-node_modules" >> $root/.gitignore
+node_modules
+.env" >> $root/.gitignore
 
 	cp -r $samples/webpack $root/_webpack
 	cp -r $samples/theme $root/theme
