@@ -19,17 +19,24 @@ install() {
 	# Install rails
 	export CURRENT_UID=$(id -u):$(id -g);
 	echo -e "\nGetting $BUILD_IMAGE locally, pulling from hub or falling back to _docker/Dockerfile...\n"
+
 	yarn d hasImages 2>/dev/null || sudo -E docker-compose pull web || yarn d rebuild
 
 	# Add to gitignore
-	echo "
-# Docker
+	echo "# Docker
 _docker/data" >> $root/.gitignore
 
-	# Insert scripts to package.json
-	sed -i -e "/\"private\"/r $samples/postinstall/package.json.script.txt" $root/package.json
-	yarn d start
+	cp -r $samples/webpack $root/_webpack
+	cp -r $samples/theme $root/theme
+	mkdir -p $root/_wordpress/wp-content/themes
 
-	echo -e "\nDone! Wordpress at http://localhost:8000"
+	# Insert scripts to package.json
+	# sed -i -e "/\"private\"/r $samples/postinstall/package.json.script.txt" $root/package.json
+	yarn install
+
+	yarn d start
+	yarn start
+
+	echo -e "\nDone! Wordpress at http://localhost:3000"
 }
 

@@ -1,6 +1,4 @@
 #!/bin/bash
 
 # Start the main process.
-# ./app/_docker/docker-entrypoint.sh
-
-tail -F anything
+/usr/local/bin/docker-entrypoint.sh apache2-foreground

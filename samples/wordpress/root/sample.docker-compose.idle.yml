@@ -1,0 +1,5 @@
+version: "3.5"
+
+services:
+  web:
+    command: "bash -c 'tail -f /dev/null'"

@@ -13,13 +13,18 @@ services:
       - ./_docker/data/db:/var/lib/mysql
 
   web:
-    user: ${CURRENT_UID}
-    working_dir: /app
-    command: "bash -c '/app/_docker-resources/scripts/wait-for-it.sh db:3306 -s -- sh /app/_docker/startup.sh'"
+    user: $CURRENT_UID
+    links:
+      - db:mysql
+    sysctls:
+      net.ipv4.ip_unprivileged_port_start: "0"
+    command: 'bash -c "sh /_docker/startup.sh"'
     image: $BUILD_IMAGE
     volumes:
-      - .:/app
-      - /etc/passwd:/etc/passwd
+      - ./_docker:/_docker
+      - ./_wordpress:/var/www/html
+      - ./theme:/var/www/html/wp-content/themes/$APP_NAME
+      - ./_docker/uploads.ini:/usr/local/etc/php/conf.d/uploads.ini"
     depends_on:
       - db
     environment:
