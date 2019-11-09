@@ -20,36 +20,52 @@ function resolveApp(relativePath) {
   return path.resolve(appDirectory, relativePath);
 }
 
-const paths = {
-  appSrc: resolveApp('theme/assets'),
-  appBuild: resolveApp('theme/_build'),
-  appIndexJs: resolveApp('theme/assets/index.js'),
-  appNodeModules: resolveApp('node_modules'),
-};
+const paths = [
+  'theme',
+  'plugin'
+];
+
+
+// /**
+//  * Theme assets
+//  */
+// add_action('wp_enqueue_scripts', function () {
+// 	$manifest = json_decode(file_get_contents('_build/assets.json', true));
+// 	$main = $manifest->main;
+// 	wp_enqueue_style('theme-css', get_template_directory_uri() . "/_build/" . $main->css,  false, null);
+// 	wp_enqueue_script('theme-js', get_template_directory_uri() . "/_build/" . $main->js, [], null, true);
+// }, 10);
+
+
+// /**
+//  * Plugin assets
+//  */
+// add_action('wp_enqueue_scripts', function () {
+// 	$manifest = json_decode(file_get_contents('_build/assets.json', true));
+// 	$main = $manifest->main;
+// 	wp_enqueue_style('plugin-css', plugin_dir_url( __FILE__ ) . "_build/" . $main->css,  false, null);
+// 	wp_enqueue_script('plugin-js', plugin_dir_url( __FILE__ ) . "_build/" . $main->js, [], null, true);
+// }, 100);
+
 
 const DEV = process.env.NODE_ENV === 'development';
 
-module.exports = {
+const config = {
   bail: !DEV,
   mode: DEV ? 'development' : 'production',
   // We generate sourcemaps in production. This is slow but gives good results.
   // You can exclude the *.map files from the build during deployment.
   target: 'web',
   devtool: DEV ? 'cheap-eval-source-map' : 'source-map',
-  entry: [paths.appIndexJs],
   output: {
-    path: paths.appBuild,
     filename: DEV ? 'bundle.js' : 'bundle.[hash:8].js'
   },
   module: {
     rules: [
-      // Disable require.ensure as it's not a standard language feature.
-      { parser: { requireEnsure: false } },
       // Transform ES6 with Babel
       {
         test: /\.js?$/,
         loader: 'babel-loader',
-        include: paths.appSrc,
       },
       {
         test: /.scss$/,
@@ -76,7 +92,9 @@ module.exports = {
           },
           "sass-loader"
           ],
-        }
+        },
+      // Disable require.ensure as it's not a standard language feature.
+      { parser: { requireEnsure: false } },
     ],
   },
   optimization: {
@@ -104,19 +122,12 @@ module.exports = {
     ]
   },
   plugins: [
-    !DEV && new CleanWebpackPlugin(['_build'], {
-      root: process.cwd() + '/theme'
-    }),
     new MiniCssExtractPlugin({
       filename: DEV ? 'bundle.css' : 'bundle.[hash:8].css'
     }),
     new webpack.EnvironmentPlugin({
       NODE_ENV: 'development', // use 'development' unless process.env.NODE_ENV is defined
       DEBUG: false,
-    }),
-    new AssetsPlugin({
-      path: paths.appBuild,
-      filename: 'assets.json',
     }),
     DEV &&
       new FriendlyErrorsPlugin({
@@ -133,3 +144,42 @@ module.exports = {
       }),
   ].filter(Boolean),
 };
+
+
+const pathConfigs = paths.map(path => {
+  const paths = {
+    src: resolveApp(`${path}/assets`),
+    build: resolveApp(`${path}/_build`),
+    indexJs: resolveApp(`${path}/assets/index.js`),
+    nodeModules: resolveApp('node_modules'),
+  };
+
+  const pathConfig = Object.assign({}, config, {
+    name: path,
+    entry: [paths.indexJs],
+  });
+
+  pathConfig.output = Object.assign({}, pathConfig.output, {
+    path: paths.build
+  });
+
+  pathConfig.module.rules[0] = Object.assign({}, pathConfig.module.rules[0], {
+    include: paths.src
+  })
+
+  pathConfig.plugins = [
+    new AssetsPlugin({
+      path: paths.build,
+      filename: 'assets.json',
+    }),
+    new CleanWebpackPlugin(['_build'], {
+      root: process.cwd() + `/${path}`
+    }),
+    ...pathConfig.plugins,
+  ].filter(Boolean)
+
+  return pathConfig
+})
+
+
+module.exports = pathConfigs
