@@ -48,6 +48,7 @@ const paths = [
 // }, 100);
 
 
+
 const DEV = process.env.NODE_ENV === 'development';
 
 const config = {
@@ -66,6 +67,12 @@ const config = {
       {
         test: /\.js?$/,
         loader: 'babel-loader',
+      },
+      {
+        test: /\.(ttf|eot|svg|gif)(\?v=[0-9]\.[0-9]\.[0-9])?$/,
+            use: [{
+                loader: 'file-loader'
+            }]
       },
       {
         test: /.scss$/,
@@ -164,6 +171,10 @@ const pathConfigs = paths.map(path => {
   });
 
   pathConfig.module.rules[0] = Object.assign({}, pathConfig.module.rules[0], {
+    include: paths.src
+  })
+
+  pathConfig.module.rules[1] = Object.assign({}, pathConfig.module.rules[1], {
     include: paths.src
   })
 
