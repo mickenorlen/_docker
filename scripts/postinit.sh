@@ -12,7 +12,7 @@ case "$1" in
 esac
 
 
-$(./utils.sh getEnv "$samples/root/.sample.env")
+$(./utils.sh parseEnv "$samples/root/.sample.env")
 
 mkdir -p $root/_docker
 

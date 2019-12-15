@@ -1,5 +1,6 @@
 #!/bin/sh
-export $(egrep -v '^#' .env | xargs); # parse .env
+utils='./_docker-resources/scripts/utils.sh'
+$($utils "parseEnv" ".env")
 source ./_docker/scripts.sh
 
 # function startup() { # Commands run at container startup
@@ -87,6 +88,11 @@ function rmall() { # Rm: containers, images, deps, $arg1 = env
 
 function rebuild() { # Rebuild image $BUILD_IMAGE from _docker (.env)
 	docker build --build-arg PARENT_IMAGE=$PARENT_IMAGE _docker -t $BUILD_IMAGE
+}
+
+function update() {
+	docker pull $PARENT_IMAGE
+	rebuild
 }
 
 function push() { # Push rebuilt image $BUILD_IMAGE to docker hub

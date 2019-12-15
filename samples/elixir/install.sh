@@ -15,7 +15,7 @@ install() {
 	# Update .env
 	echo -n "Edit .env [enter]"
 	read waiting
-	$($scripts/utils.sh getEnv "$root/.env")
+	$($scripts/utils.sh parseEnv "$root/.env")
 
 	# Install elixir
 	export CURRENT_UID=$(id -u):$(id -g);
