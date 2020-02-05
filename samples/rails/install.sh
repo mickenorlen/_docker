@@ -20,7 +20,7 @@ install() {
 	export CURRENT_UID=$(id -u):$(id -g);
 	echo -e "\nGetting $BUILD_IMAGE locally, pulling from hub or falling back to _docker/Dockerfile...\n"
 	yarn d hasImages 2>/dev/null || sudo -E docker-compose pull web || yarn d rebuild
-	sudo -E docker-compose run --no-deps --rm web bash -c "bundle install && bundle exec rails new . --force -B --database=postgresql && bundle update"
+	sudo -E docker-compose run --no-deps --rm web bash -c "bundle install && bundle exec rails new . -f --database=postgresql && bundle update && yarn install"
 
 	# Add to gitignore
 	echo "

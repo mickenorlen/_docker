@@ -8,8 +8,10 @@ services:
 
   web:
     user: ${CURRENT_UID}
+    links:
+      - db:mysql
+    command: 'bash -c "sh ./_docker/startup.sh"'
     working_dir: /app
-    command: "bash -c '/app/_docker-resources/scripts/wait-for-it.sh db:5432 -s -- sh /app/_docker/startup.sh'"
     image: $BUILD_IMAGE
     volumes:
       - .:/app
