@@ -24,6 +24,8 @@ install() {
 
 	# Add to gitignore
 	echo "
+.env
+
 # Docker
 _docker/data
 !_docker/data/home
