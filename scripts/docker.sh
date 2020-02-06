@@ -16,7 +16,7 @@ function help() { # Show list of functions
 
 # Internal functions not listed in help as not prefixed by function
 getEnv() {
-	if [[ $1 == 'prod' ]]; then echo 'prod'; elif [[ $1 == 'idle' ]]; then echo 'idle'; else echo 'dev'; fi
+	if [[ $1 == 'prod' ]]; then echo 'prod'; elif [[ $1 == 'staging' ]]; then echo 'staging'; elif [[ $1 == 'idle' ]]; then echo 'idle'; else echo 'dev'; fi
 }
 
 getService() {
