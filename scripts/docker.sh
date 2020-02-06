@@ -191,12 +191,8 @@ function exec() { # Exec in container, $arg1 = env, $arg2 = service, $arg3 = com
 	$cmd run --no-deps --rm ${service} bash -c "${3}"
 }
 
-function mountremote() { # Mount remote to _remote, $arg1 = prod/staging=prod
-	if [[ -z $1 ]]; then
-		sshfs ${SRV_USER}@${SRV_DOMAIN}:${SRV_REPO_PATH_STAGING} _remote-staging
-	else
-		sshfs ${SRV_USER}@${SRV_DOMAIN}:${SRV_REPO_PATH_PROD} _remote-prod
-	fi
+function mountremote() { # Mount remote to _remote
+	sshfs ${SRV_USER}@${SRV_DOMAIN}:${SRV_REPO_PATH} _remote
 }
 
 function umountremote() { # Unmount _remote
