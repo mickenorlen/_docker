@@ -26,6 +26,8 @@ getService() {
 composeCommand() {
 	if [[ $1 == 'prod' ]]; then
 		echo 'docker-compose -f docker-compose.yml -f docker-compose.prod.yml';
+	elif [[ $1 == 'staging' ]]; then
+		echo 'docker-compose -f docker-compose.yml -f docker-compose.staging.yml';
 	elif [[ $1 == 'idle' ]]; then
 		echo 'docker-compose -f docker-compose.yml -f docker-compose.dev.yml -f docker-compose.idle.yml';
 	else
@@ -190,8 +192,11 @@ function exec() { # Exec in container, $arg1 = env, $arg2 = service, $arg3 = com
 }
 
 function mountremote() { # Mount remote to _remote, $arg1 = prod/staging=prod
-	[[ -z $1 ]] && path=${SRV_REPO_PATH_PROD} || path=${SRV_REPO_PATH_STAGING};
-	sshfs ${SRV_USER}@${SRV_DOMAIN}:${path} _remote
+	if [[ -z $1 ]]; then
+		sshfs ${SRV_USER}@${SRV_DOMAIN}:${SRV_REPO_PATH_STAGING} _remote-staging
+	else
+		sshfs ${SRV_USER}@${SRV_DOMAIN}:${SRV_REPO_PATH_PROD} _remote-prod
+	fi
 }
 
 function umountremote() { # Unmount _remote

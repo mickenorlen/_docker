@@ -30,7 +30,8 @@ install() {
 # Docker
 _docker/data
 !_docker/data/home
-_remote
+_remote-prod
+_remote-staging
 _docker/data/home/.bundle" >> $root/.gitignore
 
 	# Insert scripts to package.json
