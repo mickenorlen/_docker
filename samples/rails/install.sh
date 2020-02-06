@@ -3,6 +3,7 @@
 install() {
 	data=$root/_docker/data
 	mkdir -p $data/db $data/home $data/bundle
+	mkdir $root/_remote
 
 	# Soft copy samples
 	$(./utils.sh cpSamples "$samples/root" "$root");
@@ -29,6 +30,7 @@ install() {
 # Docker
 _docker/data
 !_docker/data/home
+_remote
 _docker/data/home/.bundle" >> $root/.gitignore
 
 	# Insert scripts to package.json

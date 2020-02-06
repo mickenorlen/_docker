@@ -23,6 +23,16 @@ getService() {
 	if [[ -z $1 ]]; then echo 'web'; else echo $1; fi
 }
 
+composeCommand() {
+	if [[ $1 == 'prod' ]]; then
+		echo 'docker-compose -f docker-compose.yml -f docker-compose.prod.yml';
+	elif [[ $1 == 'idle' ]]; then
+		echo 'docker-compose -f docker-compose.yml -f docker-compose.dev.yml -f docker-compose.idle.yml';
+	else
+		echo 'docker-compose -f docker-compose.yml -f docker-compose.dev.yml';
+	fi
+}
+
 # Functions not listed in help as not prefixed by function
 hasContainers() {
 	[ $(docker container ls -a -f "name=${APP_NAME}_$1" | wc -l) -gt 1 ]
@@ -104,14 +114,7 @@ function rebuild() { # Rebuild image $BUILD_IMAGE from _docker (.env)
 }
 
 function pull() { # $arg1 = env
-	env=$(getEnv $1)
-	if [[ $env == 'prod' ]]; then
-		docker-compose -f docker-compose.yml -f docker-compose.prod.yml pull;
-	elif [[ $env == 'idle' ]]; then
-		docker-compose -f docker-compose.yml -f docker-compose.dev.yml -f docker-compose.idle.yml pull;
-	else
-		docker-compose -f docker-compose.yml -f docker-compose.dev.yml pull;
-	fi
+	$(composeCommand $1) pull
 }
 
 function push() { # Push rebuilt image $BUILD_IMAGE to docker hub
@@ -125,13 +128,7 @@ function start() { # Start/restart container, $arg1 = env
 	echo "env: $env"
 	export CURRENT_UID=$(id -u):$(id -g);
 	stop $env;
-	if [[ $env == 'prod' ]]; then
-		docker-compose -f docker-compose.yml -f docker-compose.prod.yml up -d;
-	elif [[ $env == 'idle' ]]; then
-		docker-compose -f docker-compose.yml -f docker-compose.dev.yml -f docker-compose.idle.yml up -d;
-	else
-		docker-compose -f docker-compose.yml -f docker-compose.dev.yml up -d;
-	fi
+	$(composeCommand $1) up -d
 }
 
 function stop() { # Stop container, $arg1 = env
@@ -183,4 +180,22 @@ function rootbash() { # Enter container as root with bash, $arg1 = env $arg2 = s
 		echo "Not running"
 	fi
 }
+
+function exec() { # Exec in container, $arg1 = env, $arg2 = service, $arg3 = command
+	export CURRENT_UID=$(id -u):$(id -g);
+	cmd=$(composeCommand $1)
+	service=$(getService $2)
+	$cmd run --no-deps --rm ${service} ${3}
+}
+
+function mountremote() { # Mount remote to _remote, $arg1 = prod/staging=prod
+	[[ -z $1 ]] && path=${SRV_REPO_PATH_PROD} || path=${SRV_REPO_PATH_STAGING};
+	sshfs ${SRV_USER}@${SRV_DOMAIN}:${path} _remote
+}
+
+function umountremote() { # Unmount _remote
+	# fusermount -u _remote
+	sudo umount -l _remote
+}
+
 
