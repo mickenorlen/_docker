@@ -114,6 +114,7 @@ function rebuild() { # Rebuild image $BUILD_IMAGE from _docker (.env)
 }
 
 function pull() { # $arg1 = env
+	export CURRENT_UID=$(id -u):$(id -g);
 	$(composeCommand $1) pull
 }
 
@@ -124,9 +125,9 @@ function push() { # Push rebuilt image $BUILD_IMAGE to docker hub
 
 # Containers
 function start() { # Start/restart container, $arg1 = env
+	export CURRENT_UID=$(id -u):$(id -g);
 	env=$(getEnv $1)
 	echo "env: $env"
-	export CURRENT_UID=$(id -u):$(id -g);
 	stop $env;
 	$(composeCommand $1) up -d
 }
@@ -185,7 +186,7 @@ function exec() { # Exec in container, $arg1 = env, $arg2 = service, $arg3 = com
 	export CURRENT_UID=$(id -u):$(id -g);
 	cmd=$(composeCommand $1)
 	service=$(getService $2)
-	$cmd run --no-deps --rm ${service} ${3}
+	$cmd run --no-deps --rm ${service} bash -c "${3}"
 }
 
 function mountremote() { # Mount remote to _remote, $arg1 = prod/staging=prod
