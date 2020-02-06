@@ -19,6 +19,10 @@ getEnv() {
 	if [[ $1 == 'prod' ]]; then echo 'prod'; elif [[ $1 == 'idle' ]]; then echo 'idle'; else echo 'dev'; fi
 }
 
+getService() {
+	if [[ -z $1 ]]; then echo 'web'; else echo $1; fi
+}
+
 # Functions not listed in help as not prefixed by function
 hasContainers() {
 	[ $(docker container ls -a -f "name=${APP_NAME}_$1" | wc -l) -gt 1 ]
@@ -40,6 +44,15 @@ function list() { # List containers and images
 	docker ps -a
 	echo
 	docker images
+}
+
+function df() { # Get docker disk usage
+	docker system df
+}
+
+function pruneall() { # Prune all stopped and unused including volumes, $arg1 = force
+	[[ $1 == 'force' ]] && force='-f' || force=''; # Set force or empty
+	docker system prune --all --volumes $force;
 }
 
 function rmc() { # Rm containers, $arg1 = env
@@ -78,7 +91,7 @@ function rmi() { # Rm image $arg1 = force
 	fi
 }
 
-function rmall() { # Rm: containers, images, deps, $arg1 = env
+function rmci() { # Rm: containers, images, deps, $arg1 = env
 	env=$(getEnv $1)
 	rmc $env
 	echo
@@ -90,9 +103,15 @@ function rebuild() { # Rebuild image $BUILD_IMAGE from _docker (.env)
 	docker build --build-arg PARENT_IMAGE=$PARENT_IMAGE _docker -t $BUILD_IMAGE
 }
 
-function update() {
-	docker pull $PARENT_IMAGE
-	rebuild
+function pull() { # $arg1 = env
+	env=$(getEnv $1)
+	if [[ $env == 'prod' ]]; then
+		docker-compose -f docker-compose.yml -f docker-compose.prod.yml pull;
+	elif [[ $env == 'idle' ]]; then
+		docker-compose -f docker-compose.yml -f docker-compose.dev.yml -f docker-compose.idle.yml pull;
+	else
+		docker-compose -f docker-compose.yml -f docker-compose.dev.yml pull;
+	fi
 }
 
 function push() { # Push rebuilt image $BUILD_IMAGE to docker hub
@@ -123,37 +142,43 @@ function stop() { # Stop container, $arg1 = env
 	fi
 }
 
-function logs() { # Get container log, $arg1 = env
+function logs() { # Get container log, $arg1 = env, $arg2 = service, $arg3 = follow=true, $arg4 = lines=100
 	env=$(getEnv $1)
+	service=$(getService $2)
+	[[ $3 == 'false' ]] && follow='' || follow='-f'; # Set force or empty
+	[[ -z $4 ]] && lines='100' || lines=$4; # Set force or empty
 	if hasContainers $env; then
-		docker logs -f $(docker container ls -af "name=${APP_NAME}_${env}_web" --format {{.ID}});
+		docker logs ${follow} $(docker container ls -af "name=${APP_NAME}_${env}_${service}" --format {{.ID}}) --tail	$lines;
 	else
-		echo "${APP_NAME}_${env}_web no container"
+		echo "${APP_NAME}_${env}_${service} no container"
 	fi
 }
 
-function clearlogs() { # Clear logs of container, arg1 = env
+function clearlogs() { # Clear logs of container, $arg1 = env, $arg2 = service
 	env=$(getEnv $1)
+	service=$(getService $2)
 	if hasContainers $env; then
-		sudo truncate -s 0 $(docker inspect --format='{{.LogPath}}' ${APP_NAME}_${env}_web)
+		sudo truncate -s 0 $(docker inspect --format='{{.LogPath}}' ${APP_NAME}_${env}_${service})
 	else
-		echo "${APP_NAME}_${env}_web no container"
+		echo "${APP_NAME}_${env}_${service} no container"
 	fi
 }
 
-function bash() { # Enter container with bash, $arg1 = env
+function bash() { # Enter container with bash, $arg1 = env, $arg2 = service
 	env=$(getEnv $1)
+	service=$(getService $2)
 	if isRunning $env; then
-		docker exec -it "${APP_NAME}_${env}_web" /bin/bash
+		docker exec -it "${APP_NAME}_${env}_${service}" /bin/bash
 	else
 		echo "Not running"
 	fi
 }
 
-function rootbash() { # Enter container as root with bash, $arg1 = env
+function rootbash() { # Enter container as root with bash, $arg1 = env $arg2 = service
 	env=$(getEnv $1)
+	service=$(getService $2)
 	if isRunning $env; then
-		docker exec --user 0 -it "${APP_NAME}_${env}_web" /bin/bash
+		docker exec --user 0 -it "${APP_NAME}_${env}_${service}" /bin/bash
 	else
 		echo "Not running"
 	fi
