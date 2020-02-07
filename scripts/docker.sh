@@ -168,7 +168,7 @@ function bash() { # Enter container with bash, $arg1 = env, $arg2 = service
 	env=$(getEnv $1)
 	service=$(getService $2)
 	if isRunning $env; then
-		docker exec -it "${APP_NAME}_${env}_${service}" /bin/bash
+		docker run -it "${APP_NAME}_${env}_${service}" /bin/bash
 	else
 		echo "Not running"
 	fi
@@ -178,13 +178,13 @@ function rootbash() { # Enter container as root with bash, $arg1 = env $arg2 = s
 	env=$(getEnv $1)
 	service=$(getService $2)
 	if isRunning $env; then
-		docker exec --user 0 -it "${APP_NAME}_${env}_${service}" /bin/bash
+		docker run --user 0 -it "${APP_NAME}_${env}_${service}" /bin/bash
 	else
 		echo "Not running"
 	fi
 }
 
-function exec() { # Exec in container, $arg1 = env, $arg2 = service, $arg3 = command
+function run() { # Run in container, $arg1 = env, $arg2 = service, $arg3 = command
 	export CURRENT_UID=$(id -u):$(id -g);
 	cmd=$(composeCommand $1)
 	service=$(getService $2)
